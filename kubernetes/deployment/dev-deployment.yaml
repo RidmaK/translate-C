@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: cb-coordinator
+  name: cb-coordinator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cb-coordinator
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: cb-coordinator
+    spec:
+      containers:
+        - image: CONTAINER_REGISTRY_IMAGE
+          name: cb-coordinator
+          resources:
+            limits:
+              memory: '256Mi'
+              cpu: '200m'
+          readinessProbe:
+            tcpSocket:
+              port: 5001
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 5001
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          envFrom:
+            - secretRef:
+                name: cb-coordinator-env
+      nodeSelector:
+        env: dev
+        category: main
+      tolerations:
+        - effect: NoSchedule
+          key: main
+          operator: Equal
+          value: 'true'
+status: {}
